@@ -9,6 +9,7 @@ class Player{
     private final String name;
     private int place = 0;
     private int purse = 0;
+    private boolean inPenaltyBox = false;
 
     public Player(String name) {
         this.name = name;
@@ -34,11 +35,18 @@ class Player{
     public void incrementPurse() {
         purse++;
     }
+
+    public boolean inPenaltyBox(){
+        return inPenaltyBox;
+    }
+
+    public void getPenalty(){
+        inPenaltyBox = true;
+    }
 }
 
 public class TriviaGame {
     ArrayList<Player> players = new ArrayList<>();
-    boolean[] inPenaltyBox = new boolean[6];
 
     List<String> popQuestions = new LinkedList<>();
     List<String> scienceQuestions = new LinkedList<>();
@@ -65,8 +73,6 @@ public class TriviaGame {
         Player player = new Player(playerName);
         players.add(player);
 
-        inPenaltyBox[players.size()] = false;
-
         print(playerName + " was added");
         print("They are player number " + players.size());
         return true;
@@ -76,7 +82,7 @@ public class TriviaGame {
         print(currentPlayer().name() + " is the current player");
         print("They have rolled a " + roll);
 
-        if (inPenaltyBox[currentPlayer]) {
+        if (currentPlayer().inPenaltyBox()) {
             if (roll % 2 != 0) {
                 isGettingOutOfPenaltyBox = true;
 
@@ -143,7 +149,7 @@ public class TriviaGame {
     }
 
     public boolean wasCorrectlyAnswered() {
-        if (inPenaltyBox[currentPlayer]) {
+        if (currentPlayer().inPenaltyBox()) {
             if (isGettingOutOfPenaltyBox) {
                 return correctAnswerActions();
             } else {
@@ -174,7 +180,7 @@ public class TriviaGame {
     public boolean wrongAnswer() {
         print("Question was incorrectly answered");
         print(currentPlayer().name() + " was sent to the penalty box");
-        inPenaltyBox[currentPlayer] = true;
+        currentPlayer().getPenalty();
 
         currentPlayer++;
         if (currentPlayer == players.size()) currentPlayer = 0;
