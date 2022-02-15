@@ -16,7 +16,7 @@ public class TriviaGameTest {
         game.add("Chet");
         game.add("Pat");
         game.roll(2);
-        game.wasCorrectlyAnswered();
+        game.correctAnswer();
 
         assertEquals(Arrays.asList(
                 "Chet was added",

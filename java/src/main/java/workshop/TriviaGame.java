@@ -40,13 +40,13 @@ class Player{
         return inPenaltyBox;
     }
 
-    public void getPenalty(){
-        inPenaltyBox = true;
+    public void switchPenaltyBox(){
+        inPenaltyBox = !inPenaltyBox;
     }
 }
 
 public class TriviaGame {
-    ArrayList<Player> players = new ArrayList<>();
+    List<Player> players = new ArrayList<>();
 
     List<String> popQuestions = new LinkedList<>();
     List<String> scienceQuestions = new LinkedList<>();
@@ -54,28 +54,26 @@ public class TriviaGame {
     List<String> rockQuestions = new LinkedList<>();
 
     int currentPlayer = 0;
-    boolean isGettingOutOfPenaltyBox;
 
     public TriviaGame() {
         for (int i = 0; i < 50; i++) {
-            popQuestions.add("Pop Question " + i);
-            scienceQuestions.add(("Science Question " + i));
-            sportsQuestions.add(("Sports Question " + i));
-            rockQuestions.add(createRockQuestion(i));
+            createQuestion(i);
         }
     }
 
-    public String createRockQuestion(int index) {
-        return "Rock Question " + index;
+    private void createQuestion(int i) {
+        popQuestions.add("Pop Question " + i);
+        scienceQuestions.add(("Science Question " + i));
+        sportsQuestions.add(("Sports Question " + i));
+        rockQuestions.add("Rock Question " + i);
     }
 
-    public boolean add(String playerName) {
+    public void add(String playerName) {
         Player player = new Player(playerName);
         players.add(player);
 
         print(playerName + " was added");
         print("They are player number " + players.size());
-        return true;
     }
 
     public void roll(int roll) {
@@ -84,29 +82,21 @@ public class TriviaGame {
 
         if (currentPlayer().inPenaltyBox()) {
             if (roll % 2 != 0) {
-                isGettingOutOfPenaltyBox = true;
-
                 print(currentPlayer().name() + " is getting out of the penalty box");
-
+                currentPlayer().switchPenaltyBox();
                 movePlayerPlace(roll);
                 announcePlayerLocationQuestion();
-
             } else {
                 print(currentPlayer().name() + " is not getting out of the penalty box");
-                isGettingOutOfPenaltyBox = false;
             }
-
         } else {
             movePlayerPlace(roll);
             announcePlayerLocationQuestion();
         }
-
     }
 
     private void announcePlayerLocationQuestion() {
-        print(currentPlayer().name()
-                + "'s new location is "
-                + currentPlayer().place());
+        print(currentPlayer().name() + "'s new location is " + currentPlayer().place());
         print("The category is " + currentCategory());
         print(nextQuestion());
     }
@@ -120,75 +110,48 @@ public class TriviaGame {
     }
 
     private String nextQuestion() {
-        switch (currentCategory()) {
-            case "Pop":
-                return popQuestions.remove(0);
-            case "Science":
-                return scienceQuestions.remove(0);
-            case "Sports":
-                return sportsQuestions.remove(0);
-            case "Rock":
-                return rockQuestions.remove(0);
-            default:
-                throw new IllegalStateException("Unexpected value: " + currentCategory());
+        switch (currentPlayer().place() % 4) {
+            case 0: return popQuestions.remove(0);
+            case 1: return scienceQuestions.remove(0);
+            case 2: return sportsQuestions.remove(0);
+            default: return rockQuestions.remove(0);
         }
     }
-
 
     private String currentCategory() {
-        if (currentPlayer().place() == 0) return "Pop";
-        if (currentPlayer().place() == 4) return "Pop";
-        if (currentPlayer().place() == 8) return "Pop";
-        if (currentPlayer().place() == 1) return "Science";
-        if (currentPlayer().place() == 5) return "Science";
-        if (currentPlayer().place() == 9) return "Science";
-        if (currentPlayer().place() == 2) return "Sports";
-        if (currentPlayer().place() == 6) return "Sports";
-        if (currentPlayer().place() == 10) return "Sports";
-        return "Rock";
-    }
-
-    public boolean wasCorrectlyAnswered() {
-        if (currentPlayer().inPenaltyBox()) {
-            if (isGettingOutOfPenaltyBox) {
-                return correctAnswerActions();
-            } else {
-                currentPlayer++;
-                if (currentPlayer == players.size()) currentPlayer = 0;
-                return true;
-            }
-        } else {
-            return correctAnswerActions();
+        switch (currentPlayer().place() % 4) {
+            case 0: return "Pop";
+            case 1: return "Science";
+            case 2: return "Sports";
+            default: return "Rock";
         }
     }
 
-    private boolean correctAnswerActions() {
+    public void correctAnswer() {
+        if (currentPlayer().inPenaltyBox()) {
+            incrementCurrentPlayer();
+        } else {
+            correctAnswerActions();
+        }
+    }
+
+    private void correctAnswerActions() {
         print("Answer was correct!!!!");
         currentPlayer().incrementPurse();
-        print(currentPlayer().name()
-                + " now has "
-                + currentPlayer().purse()
-                + " Gold Coins.");
-
-        boolean winner = didPlayerWin();
-        currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
-
-        return winner;
+        print(currentPlayer().name() + " now has " + currentPlayer().purse() + " Gold Coins.");
+        incrementCurrentPlayer();
     }
 
-    public boolean wrongAnswer() {
+    public void wrongAnswer() {
         print("Question was incorrectly answered");
         print(currentPlayer().name() + " was sent to the penalty box");
-        currentPlayer().getPenalty();
-
-        currentPlayer++;
-        if (currentPlayer == players.size()) currentPlayer = 0;
-        return true;
+        currentPlayer().switchPenaltyBox();
+        incrementCurrentPlayer();
     }
 
-    private boolean didPlayerWin() {
-        return !(currentPlayer().purse() == 6);
+    private void incrementCurrentPlayer() {
+        currentPlayer++;
+        currentPlayer %= players.size();
     }
 
     protected void print(Object message) {
