@@ -57,7 +57,7 @@ public class TriviaGameTest {
         List<String> messages = new ArrayList<>();
 
         @Override
-        protected void announce(Object message) {
+        protected void print(Object message) {
             messages.add(String.valueOf(message));
         }
 

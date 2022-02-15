@@ -8,6 +8,7 @@ import java.util.List;
 class Player{
     private final String name;
     private int place = 0;
+    private int purse = 0;
 
     public Player(String name) {
         this.name = name;
@@ -25,11 +26,18 @@ class Player{
         place += roll;
         place %= 12;
     }
+
+    public int purse() {
+        return purse;
+    }
+
+    public void incrementPurse() {
+        purse++;
+    }
 }
 
 public class TriviaGame {
     ArrayList<Player> players = new ArrayList<>();
-    int[] purses = new int[6];
     boolean[] inPenaltyBox = new boolean[6];
 
     List<String> popQuestions = new LinkedList<>();
@@ -57,46 +65,44 @@ public class TriviaGame {
         Player player = new Player(playerName);
         players.add(player);
 
-        purses[players.size()] = 0;
         inPenaltyBox[players.size()] = false;
 
-        announce(playerName + " was added");
-        announce("They are player number " + players.size());
+        print(playerName + " was added");
+        print("They are player number " + players.size());
         return true;
     }
 
     public void roll(int roll) {
-        announce(currentPlayer().name() + " is the current player");
-        announce("They have rolled a " + roll);
+        print(currentPlayer().name() + " is the current player");
+        print("They have rolled a " + roll);
 
         if (inPenaltyBox[currentPlayer]) {
             if (roll % 2 != 0) {
                 isGettingOutOfPenaltyBox = true;
 
-                announce(currentPlayer().name() + " is getting out of the penalty box");
-                movePlayerPlace(roll);
+                print(currentPlayer().name() + " is getting out of the penalty box");
 
-                announce(currentPlayer().name()
-                        + "'s new location is "
-                        + currentPlayer().place());
-                announce("The category is " + currentCategory());
-                announce(nextQuestion());
+                movePlayerPlace(roll);
+                announcePlayerLocationQuestion();
+
             } else {
-                announce(currentPlayer().name() + " is not getting out of the penalty box");
+                print(currentPlayer().name() + " is not getting out of the penalty box");
                 isGettingOutOfPenaltyBox = false;
             }
 
         } else {
-
             movePlayerPlace(roll);
-
-            announce(currentPlayer().name()
-                    + "'s new location is "
-                    + currentPlayer().place());
-            announce("The category is " + currentCategory());
-            announce(nextQuestion());
+            announcePlayerLocationQuestion();
         }
 
+    }
+
+    private void announcePlayerLocationQuestion() {
+        print(currentPlayer().name()
+                + "'s new location is "
+                + currentPlayer().place());
+        print("The category is " + currentCategory());
+        print(nextQuestion());
     }
 
     private void movePlayerPlace(int roll) {
@@ -139,45 +145,35 @@ public class TriviaGame {
     public boolean wasCorrectlyAnswered() {
         if (inPenaltyBox[currentPlayer]) {
             if (isGettingOutOfPenaltyBox) {
-                announce("Answer was correct!!!!");
-                purses[currentPlayer]++;
-                announce(currentPlayer().name()
-                        + " now has "
-                        + purses[currentPlayer]
-                        + " Gold Coins.");
-
-                boolean winner = didPlayerWin();
-                currentPlayer++;
-                if (currentPlayer == players.size()) currentPlayer = 0;
-
-                return winner;
+                return correctAnswerActions();
             } else {
                 currentPlayer++;
                 if (currentPlayer == players.size()) currentPlayer = 0;
                 return true;
             }
-
-
         } else {
-
-            announce("Answer was correct!!!!");
-            purses[currentPlayer]++;
-            announce(currentPlayer().name()
-                    + " now has "
-                    + purses[currentPlayer]
-                    + " Gold Coins.");
-
-            boolean winner = didPlayerWin();
-            currentPlayer++;
-            if (currentPlayer == players.size()) currentPlayer = 0;
-
-            return winner;
+            return correctAnswerActions();
         }
     }
 
+    private boolean correctAnswerActions() {
+        print("Answer was correct!!!!");
+        currentPlayer().incrementPurse();
+        print(currentPlayer().name()
+                + " now has "
+                + currentPlayer().purse()
+                + " Gold Coins.");
+
+        boolean winner = didPlayerWin();
+        currentPlayer++;
+        if (currentPlayer == players.size()) currentPlayer = 0;
+
+        return winner;
+    }
+
     public boolean wrongAnswer() {
-        announce("Question was incorrectly answered");
-        announce(currentPlayer().name() + " was sent to the penalty box");
+        print("Question was incorrectly answered");
+        print(currentPlayer().name() + " was sent to the penalty box");
         inPenaltyBox[currentPlayer] = true;
 
         currentPlayer++;
@@ -186,10 +182,10 @@ public class TriviaGame {
     }
 
     private boolean didPlayerWin() {
-        return !(purses[currentPlayer] == 6);
+        return !(currentPlayer().purse() == 6);
     }
 
-    protected void announce(Object message) {
+    protected void print(Object message) {
         System.out.println(message);
     }
 }
