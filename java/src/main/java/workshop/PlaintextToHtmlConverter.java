@@ -1,10 +1,12 @@
 package workshop;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 import static java.lang.String.join;
 import static java.lang.String.valueOf;
@@ -16,7 +18,12 @@ public class PlaintextToHtmlConverter {
     }
 
     protected String read() throws IOException {
-        return new String(Files.readAllBytes(Paths.get("sample.txt")));
+        Scanner fileScanner = new Scanner(new File("sample.txt"));
+        String returnStr = "";
+        while (fileScanner.hasNextLine()){
+            returnStr+=fileScanner.nextLine()+"\n";
+        }
+        return returnStr;
     }
 
     private String basicHtmlEncode(String source) {
