@@ -1,77 +1,10 @@
-package workshop;
+package workshop.trivia;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
-class Player{
-    private final String name;
-    private int place = 0;
-    private int coins = 0;
-    private boolean inPenalty = false;
-
-    public Player(String name) {
-        this.name = name;
-    }
-
-    public String name(){
-        return name;
-    }
-
-    public int place() {
-        return place;
-    }
-
-    public void move(int roll) {
-        place += roll;
-        place %= 12;
-    }
-
-    public int coin() {
-        return coins;
-    }
-
-    public void addCoin() {
-        coins++;
-    }
-
-    public boolean inPenalty(){
-        return inPenalty;
-    }
-
-    public void invertPenalty(){
-        inPenalty = !inPenalty;
-    }
-}
-
-class Questions{
-    private final Map<String, List<String>> questionSet = new HashMap<>();
-
-    public Questions(){
-        questionSet.put("Pop", new ArrayList<>());
-        questionSet.put("Science", new ArrayList<>());
-        questionSet.put("Sports", new ArrayList<>());
-        questionSet.put("Rock", new ArrayList<>());
-
-        for (int i = 0; i < 50; i++) {
-            questionSet.get("Pop").add("Pop Question " + i);
-            questionSet.get("Science").add(("Science Question " + i));
-            questionSet.get("Sports").add(("Sports Question " + i));
-            questionSet.get("Rock").add("Rock Question " + i);
-        }
-    }
-
-    public String nextQuestion(int playerPlace) {
-        switch (playerPlace % 4) {
-            case  0: return questionSet.get("Pop").remove(0);
-            case  1: return questionSet.get("Science").remove(0);
-            case  2: return questionSet.get("Sports").remove(0);
-            default: return questionSet.get("Rock").remove(0);
-        }
-    }
-}
 
 public class TriviaGame {
     private final List<Player> players = new ArrayList<>();
