@@ -6,6 +6,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.join;
+
 public class PlaintextToHtmlConverter {
     String source;
     int i;
@@ -15,8 +17,7 @@ public class PlaintextToHtmlConverter {
 
     public String toHtml() throws Exception {
         String text = read();
-        String htmlLines = basicHtmlEncode(text);
-        return htmlLines;
+        return basicHtmlEncode(text);
     }
 
     protected String read() throws IOException {
@@ -48,13 +49,14 @@ public class PlaintextToHtmlConverter {
                     pushACharacterToTheOutput();
             }
 
-            if (i >= source.length()) break;
+            if (i >= source.length()) {
+                break;
+            }
 
             characterToConvert = stashNextCharacterAndAdvanceThePointer();
         }
         addANewLine();
-        String finalResult = String.join("<br />", result);
-        return finalResult;
+        return join("<br />", result);
     }
 
     //pick the character from source string
@@ -65,10 +67,10 @@ public class PlaintextToHtmlConverter {
         return String.valueOf(c);
     }
 
-    //stringfy convertedLine array and push into result
+    //stringify convertedLine array and push into result
     //reset convertedLine
     private void addANewLine() {
-        String line = String.join("", convertedLine);
+        String line = join("", convertedLine);
         result.add(line);
         convertedLine = new ArrayList<>();
     }
