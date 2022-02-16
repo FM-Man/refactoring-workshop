@@ -19,11 +19,18 @@ public class PlaintextToHtmlConverter {
 
     protected String read() throws IOException {
         Scanner fileScanner = new Scanner(new File("sample.txt"));
-        String returnStr = "";
+        String content = "";
         while (fileScanner.hasNextLine()){
-            returnStr+=fileScanner.nextLine()+"\n";
+            content+=fileScanner.nextLine()+"\n";
         }
-        return returnStr;
+        return removeFinalEndLine(content);
+    }
+
+    private String removeFinalEndLine(String content) {
+        int end = content.length() - 1;
+        if(content.charAt(end) == '\n')
+            content = content.substring(0, end);
+        return content;
     }
 
     private String basicHtmlEncode(String source) {
