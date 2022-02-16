@@ -7,14 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.String.join;
+import static java.lang.String.valueOf;
 
 public class PlaintextToHtmlConverter {
-    String source;
-    int i;
-    List<String> result;
-    List<String> convertedLine;
-    String characterToConvert;
-
     public String toHtml() throws Exception {
         String text = read();
         return basicHtmlEncode(text);
@@ -25,57 +20,29 @@ public class PlaintextToHtmlConverter {
     }
 
     private String basicHtmlEncode(String source) {
-        this.source = source;
-        i = 0;
-        result = new ArrayList<>();
-        convertedLine = new ArrayList<>();
-        characterToConvert = stashNextCharacterAndAdvanceThePointer();
+        List<String> result = new ArrayList<>();
+        List<String> convertedLine = new ArrayList<>();
 
-        while (i <= this.source.length()) {
-            switch (characterToConvert) {
-                case "<":
+        for (int i=0; i < source.length(); i++) {
+            switch (source.charAt(i)) {
+                case '<':
                     convertedLine.add("&lt;");
                     break;
-                case ">":
+                case '>':
                     convertedLine.add("&gt;");
                     break;
-                case "&":
+                case '&':
                     convertedLine.add("&amp;");
                     break;
-                case "\n":
-                    addANewLine();
+                case '\n':
+                    result.add(join("", convertedLine));
+                    convertedLine = new ArrayList<>();
                     break;
                 default:
-                    pushACharacterToTheOutput();
+                    convertedLine.add( valueOf(source.charAt(i)) );
             }
-
-            if (i >= source.length()) {
-                break;
-            }
-
-            characterToConvert = stashNextCharacterAndAdvanceThePointer();
         }
-        addANewLine();
+        result.add(join("", convertedLine));
         return join("<br />", result);
-    }
-
-    //pick the character from source string
-    //and increment the pointer
-    private String stashNextCharacterAndAdvanceThePointer() {
-        char c = source.charAt(i);
-        i += 1;
-        return String.valueOf(c);
-    }
-
-    //stringify convertedLine array and push into result
-    //reset convertedLine
-    private void addANewLine() {
-        String line = join("", convertedLine);
-        result.add(line);
-        convertedLine = new ArrayList<>();
-    }
-
-    private void pushACharacterToTheOutput() {
-        convertedLine.add(characterToConvert);
     }
 }
