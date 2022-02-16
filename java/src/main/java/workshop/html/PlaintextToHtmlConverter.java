@@ -1,4 +1,4 @@
-package workshop;
+package workshop.html;
 
 import java.io.File;
 import java.io.IOException;
