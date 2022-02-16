@@ -29,7 +29,7 @@ public class FizzBuzz {
                 patternMatched = true;
             }
         }
-        if(patternMatched) return String.valueOf(number);
+        if(!patternMatched) return String.valueOf(number);
         else return returnString;
     }
 }
