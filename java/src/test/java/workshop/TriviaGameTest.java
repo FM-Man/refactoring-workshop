@@ -13,8 +13,8 @@ public class TriviaGameTest {
 
     @Test
     public void correctlyAnswered() {
-        game.add("Chet");
-        game.add("Pat");
+        game.addPlayer("Chet");
+        game.addPlayer("Pat");
         game.roll(2);
         game.correctAnswer();
 
@@ -34,8 +34,8 @@ public class TriviaGameTest {
 
     @Test
     public void wronglyAnswered() {
-        game.add("Chet");
-        game.add("Pat");
+        game.addPlayer("Chet");
+        game.addPlayer("Pat");
         game.roll(1);
         game.wrongAnswer();
 

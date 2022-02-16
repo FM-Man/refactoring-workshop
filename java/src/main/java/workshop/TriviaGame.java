@@ -1,15 +1,16 @@
 package workshop;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 class Player{
     private final String name;
     private int place = 0;
-    private int purse = 0;
-    private boolean inPenaltyBox = false;
+    private int coins = 0;
+    private boolean inPenalty = false;
 
     public Player(String name) {
         this.name = name;
@@ -23,52 +24,66 @@ class Player{
         return place;
     }
 
-    public void changePlace(int roll) {
+    public void move(int roll) {
         place += roll;
         place %= 12;
     }
 
-    public int purse() {
-        return purse;
+    public int coin() {
+        return coins;
     }
 
-    public void incrementPurse() {
-        purse++;
+    public void addCoin() {
+        coins++;
     }
 
-    public boolean inPenaltyBox(){
-        return inPenaltyBox;
+    public boolean inPenalty(){
+        return inPenalty;
     }
 
-    public void switchPenaltyBox(){
-        inPenaltyBox = !inPenaltyBox;
+    public void invertPenalty(){
+        inPenalty = !inPenalty;
+    }
+}
+
+class Questions{
+    private final Map<String, List<String>> questionSet = new HashMap<>();
+
+    public Questions(){
+        questionSet.put("Pop", new ArrayList<>());
+        questionSet.put("Science", new ArrayList<>());
+        questionSet.put("Sports", new ArrayList<>());
+        questionSet.put("Rock", new ArrayList<>());
+
+        for (int i = 0; i < 50; i++) {
+            questionSet.get("Pop").add("Pop Question " + i);
+            questionSet.get("Science").add(("Science Question " + i));
+            questionSet.get("Sports").add(("Sports Question " + i));
+            questionSet.get("Rock").add("Rock Question " + i);
+        }
+    }
+
+    public String nextQuestion(int playerPlace) {
+        switch (playerPlace % 4) {
+            case  0: return questionSet.get("Pop").remove(0);
+            case  1: return questionSet.get("Science").remove(0);
+            case  2: return questionSet.get("Sports").remove(0);
+            default: return questionSet.get("Rock").remove(0);
+        }
     }
 }
 
 public class TriviaGame {
-    List<Player> players = new ArrayList<>();
-
-    List<String> popQuestions = new LinkedList<>();
-    List<String> scienceQuestions = new LinkedList<>();
-    List<String> sportsQuestions = new LinkedList<>();
-    List<String> rockQuestions = new LinkedList<>();
+    private final List<Player> players = new ArrayList<>();
+    private final Questions questions;
 
     int currentPlayer = 0;
 
     public TriviaGame() {
-        for (int i = 0; i < 50; i++) {
-            createQuestion(i);
-        }
+        questions = new Questions();
     }
 
-    private void createQuestion(int i) {
-        popQuestions.add("Pop Question " + i);
-        scienceQuestions.add(("Science Question " + i));
-        sportsQuestions.add(("Sports Question " + i));
-        rockQuestions.add("Rock Question " + i);
-    }
-
-    public void add(String playerName) {
+    public void addPlayer(String playerName) {
         Player player = new Player(playerName);
         players.add(player);
 
@@ -80,76 +95,55 @@ public class TriviaGame {
         print(currentPlayer().name() + " is the current player");
         print("They have rolled a " + roll);
 
-        if (currentPlayer().inPenaltyBox()) {
+        if (currentPlayer().inPenalty()) {
             if (roll % 2 != 0) {
                 print(currentPlayer().name() + " is getting out of the penalty box");
-                currentPlayer().switchPenaltyBox();
-                movePlayerPlace(roll);
-                announcePlayerLocationQuestion();
+                currentPlayer().invertPenalty();
+                currentPlayer().move(roll);
+                print_playerName_place_question();
             } else {
                 print(currentPlayer().name() + " is not getting out of the penalty box");
             }
         } else {
-            movePlayerPlace(roll);
-            announcePlayerLocationQuestion();
+            currentPlayer().move(roll);
+            print_playerName_place_question();
         }
     }
 
-    private void announcePlayerLocationQuestion() {
+    private void print_playerName_place_question() {
         print(currentPlayer().name() + "'s new location is " + currentPlayer().place());
-        print("The category is " + currentCategory());
-        print(nextQuestion());
-    }
-
-    private void movePlayerPlace(int roll) {
-        currentPlayer().changePlace(roll);
+        String currentCategory;
+        switch (currentPlayer().place() % 4) {
+            case  0: currentCategory = "Pop"; break;
+            case  1: currentCategory = "Science"; break;
+            case  2: currentCategory = "Sports"; break;
+            default: currentCategory = "Rock";
+        }
+        print("The category is " + currentCategory);
+        print(questions.nextQuestion(currentPlayer().place()));
     }
 
     private Player currentPlayer() {
         return players.get(currentPlayer);
     }
 
-    private String nextQuestion() {
-        switch (currentPlayer().place() % 4) {
-            case 0: return popQuestions.remove(0);
-            case 1: return scienceQuestions.remove(0);
-            case 2: return sportsQuestions.remove(0);
-            default: return rockQuestions.remove(0);
-        }
-    }
-
-    private String currentCategory() {
-        switch (currentPlayer().place() % 4) {
-            case 0: return "Pop";
-            case 1: return "Science";
-            case 2: return "Sports";
-            default: return "Rock";
-        }
-    }
-
     public void correctAnswer() {
-        if (currentPlayer().inPenaltyBox()) {
-            incrementCurrentPlayer();
-        } else {
-            correctAnswerActions();
+        if (!currentPlayer().inPenalty()) {
+            print("Answer was correct!!!!");
+            currentPlayer().addCoin();
+            print(currentPlayer().name() + " now has " + currentPlayer().coin() + " Gold Coins.");
         }
-    }
-
-    private void correctAnswerActions() {
-        print("Answer was correct!!!!");
-        currentPlayer().incrementPurse();
-        print(currentPlayer().name() + " now has " + currentPlayer().purse() + " Gold Coins.");
-        incrementCurrentPlayer();
+        nextPlayer();
     }
 
     public void wrongAnswer() {
         print("Question was incorrectly answered");
         print(currentPlayer().name() + " was sent to the penalty box");
-        currentPlayer().switchPenaltyBox();
-        incrementCurrentPlayer();
+        currentPlayer().invertPenalty();
+        nextPlayer();
     }
 
-    private void incrementCurrentPlayer() {
+    private void nextPlayer() {
         currentPlayer++;
         currentPlayer %= players.size();
     }
