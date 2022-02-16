@@ -1,6 +1,6 @@
 package workshop.fizzBuzz;
 
-public class BuzzPaternMatcher implements PatternMatcher{
+public class BuzzPatternMatcher implements PatternMatcher{
     @Override
     public boolean matches(int number) {
         return number % 5 == 0;

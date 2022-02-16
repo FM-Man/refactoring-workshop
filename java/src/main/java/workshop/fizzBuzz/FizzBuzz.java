@@ -14,7 +14,7 @@ public class FizzBuzz {
 
     public FizzBuzz(){
         PatternMatcher fizz = new FizzPatternMatcher();
-        PatternMatcher buzz = new BuzzPaternMatcher();
+        PatternMatcher buzz = new BuzzPatternMatcher();
         patternMatchers = new ArrayList<>();
         patternMatchers.add(fizz);
         patternMatchers.add(buzz);
