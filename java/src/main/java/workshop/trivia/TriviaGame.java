@@ -31,27 +31,21 @@ public class TriviaGame {
                 print(currentPlayer().name() + " is getting out of the penalty box");
                 currentPlayer().invertPenalty();
                 currentPlayer().move(roll);
-                print_playerName_place_question();
+                print_playerName_position_question();
             } else {
                 print(currentPlayer().name() + " is not getting out of the penalty box");
             }
         } else {
             currentPlayer().move(roll);
-            print_playerName_place_question();
+            print_playerName_position_question();
         }
     }
 
-    private void print_playerName_place_question() {
-        print(currentPlayer().name() + "'s new location is " + currentPlayer().place());
-        String currentCategory;
-        switch (currentPlayer().place() % 4) {
-            case  0: currentCategory = "Pop"; break;
-            case  1: currentCategory = "Science"; break;
-            case  2: currentCategory = "Sports"; break;
-            default: currentCategory = "Rock";
-        }
+    private void print_playerName_position_question() {
+        print(currentPlayer().name() + "'s new location is " + currentPlayer().position());
+        String currentCategory = questions.currentCategory(currentPlayer().position());
         print("The category is " + currentCategory);
-        print(questions.nextQuestion(currentPlayer().place()));
+        print(questions.nextQuestion(currentPlayer().position()));
     }
 
     private Player currentPlayer() {

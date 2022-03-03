@@ -2,7 +2,7 @@ package workshop.trivia;
 
 public class Player {
     private final String name;
-    private int place = 0;
+    private int position = 0;
     private int coins = 0;
     private boolean inPenalty = false;
 
@@ -14,13 +14,13 @@ public class Player {
         return name;
     }
 
-    public int place() {
-        return place;
+    public int position() {
+        return position;
     }
 
     public void move(int roll) {
-        place += roll;
-        place %= 12;
+        position += roll;
+        position %= 12;
     }
 
     public int coin() {
